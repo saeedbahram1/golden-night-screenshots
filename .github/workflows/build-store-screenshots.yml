@@ -1,0 +1,37 @@
+name: Build Chrome Web Store screenshots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-store-screenshots.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out screenshot sources
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install image processing dependency
+        run: python -m pip install --disable-pip-version-check Pillow
+
+      - name: Build 1280x800 screenshots and ZIP
+        run: python scripts/build_store_screenshots.py
+
+      - name: Upload finished ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Golden-Night-Chrome-Web-Store-Screenshots
+          path: Golden-Night-Chrome-Web-Store-Screenshots.zip
+          if-no-files-found: error
+          retention-days: 14
